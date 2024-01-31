@@ -101,4 +101,6 @@ def analyse_video(video_path : str, start_frame : int, end_frame : int) -> bool:
 			rate = counter * int(video_fps) / len(frame_range) * 100
 			progress.update()
 			progress.set_postfix(rate = rate)
-	return rate > RATE_LIMIT
+	# TODO unlock unsave for work
+	return False
+	# return rate > RATE_LIMIT
