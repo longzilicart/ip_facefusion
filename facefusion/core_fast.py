@@ -296,33 +296,38 @@ def process_image_folder(target_folder: str) -> None:
     source_filename = os.path.basename(facefusion.globals.source_paths[0])
     source_filename, _ = os.path.splitext(os.path.basename(facefusion.globals.source_paths[0]))
     
-    for image_path in image_paths:	
-        start_time = time.time()  
-        facefusion.globals.target_path = image_path
-        if analyse_image(facefusion.globals.target_path):
-            continue 
+    for image_path in image_paths:
+        try:
+            start_time = time.time()
+            facefusion.globals.target_path = image_path
+            if analyse_image(facefusion.globals.target_path):
+                continue
                 
-        original_filename = os.path.basename(facefusion.globals.target_path)
-        new_output_path = os.path.join(facefusion.globals.output_path, f"{source_filename}_{original_filename}")
-        shutil.copy2(facefusion.globals.target_path, new_output_path) 
-        for frame_processor_module in get_frame_processors_modules(facefusion.globals.frame_processors):
-            logger.info(wording.get('processing'), frame_processor_module.NAME)
-            frame_processor_module.process_image(facefusion.globals.source_paths, new_output_path, new_output_path)
-            frame_processor_module.post_process()
-        
+            original_filename = os.path.basename(facefusion.globals.target_path)
+            new_output_path = os.path.join(facefusion.globals.output_path, f"{source_filename}_{original_filename}")
+            shutil.copy2(facefusion.globals.target_path, new_output_path)
+            
+            for frame_processor_module in get_frame_processors_modules(facefusion.globals.frame_processors):
+                logger.info("Processing", frame_processor_module.NAME)
+                frame_processor_module.process_image(facefusion.globals.source_paths, new_output_path, new_output_path)
+                frame_processor_module.post_process()
+            
 		# TODO temp 
         # logger.info(wording.get('compressing_image'), __name__.upper())
         # if not compress_image(new_output_path):
         #     logger.error(wording.get('compressing_image_failed'), __name__.upper())
         #     continue  
         
-        if is_image(new_output_path):
-            seconds = '{:.2f}'.format(time.time() - start_time)
-            logger.info(wording.get('processing_image_succeed').format(seconds = seconds), __name__.upper())
-        else:
-            logger.error(wording.get('processing_image_failed'), __name__.upper())
+            if is_image(new_output_path):
+                seconds = '{:.2f}'.format(time.time() - start_time)
+                logger.info(f"Image processing succeeded in {seconds} seconds", __name__.upper())
+            else:
+                logger.error("Image processing failed", __name__.upper())
+        except Exception as e:
+            logger.error(f"An exception occurred while processing image {image_path}: {e}", "ProcessImageFolder")
+    
+    logger.info("All images have been processed", "ProcessImageFolder")
 
-    logger.info("所有图片处理完成", "ProcessImageFolder")
 
 
 
