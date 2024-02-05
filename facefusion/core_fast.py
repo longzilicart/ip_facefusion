@@ -305,6 +305,7 @@ def process_image_folder(target_folder: str) -> None:
                 
             original_filename = os.path.basename(facefusion.globals.target_path)
             new_output_path = os.path.join(facefusion.globals.output_path, f"{source_filename}_{original_filename}")
+            os.makedirs(os.path.dirname(new_output_path), exist_ok=True)
             shutil.copy2(facefusion.globals.target_path, new_output_path)
             
             for frame_processor_module in get_frame_processors_modules(facefusion.globals.frame_processors):
