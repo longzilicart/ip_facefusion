@@ -293,9 +293,17 @@ def process_image_folder(target_folder: str) -> None:
     for format in image_formats:
         image_paths.extend(glob.glob(os.path.join(target_folder, f"*.{format}")))
 
-    source_filename = os.path.basename(facefusion.globals.source_paths[0])
-    source_filename, _ = os.path.splitext(os.path.basename(facefusion.globals.source_paths[0]))
-    
+    # source_filename = os.path.basename(facefusion.globals.source_paths[0])
+    # source_filename, _ = os.path.splitext(os.path.basename(facefusion.globals.source_paths[0]))
+	
+    source_paths = facefusion.globals.source_paths
+    if len(source_paths) > 1:
+        source_filenames = [os.path.splitext(os.path.basename(path))[0] for path in source_paths]
+        source_filename = "Mix_" + "_".join(source_filenames)
+    else:
+        source_filename = os.path.basename(source_paths[0])
+        source_filename, _ = os.path.splitext(source_filename)
+
     for image_path in image_paths:
         try:
             start_time = time.time()
